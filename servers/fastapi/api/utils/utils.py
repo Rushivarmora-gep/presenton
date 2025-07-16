@@ -51,6 +51,10 @@ def get_user_config():
         or os.getenv("CUSTOM_LLM_API_KEY"),
         CUSTOM_MODEL=existing_config.CUSTOM_MODEL or os.getenv("CUSTOM_MODEL"),
         PEXELS_API_KEY=existing_config.PEXELS_API_KEY or os.getenv("PEXELS_API_KEY"),
+        AZURE_OPENAI_ENDPOINT=existing_config.AZURE_OPENAI_ENDPOINT or os.getenv("AZURE_OPENAI_ENDPOINT"),
+        AZURE_OPENAI_API_KEY=existing_config.AZURE_OPENAI_API_KEY or os.getenv("AZURE_OPENAI_API_KEY"),
+        AZURE_OPENAI_DEPLOYMENT=existing_config.AZURE_OPENAI_DEPLOYMENT or os.getenv("AZURE_OPENAI_DEPLOYMENT"),
+        AZURE_OPENAI_API_VERSION=existing_config.AZURE_OPENAI_API_VERSION or os.getenv("AZURE_OPENAI_API_VERSION"),
     )
 
 
@@ -74,6 +78,14 @@ def update_env_with_user_config():
         os.environ["CUSTOM_MODEL"] = user_config.CUSTOM_MODEL
     if user_config.PEXELS_API_KEY:
         os.environ["PEXELS_API_KEY"] = user_config.PEXELS_API_KEY
+    if user_config.AZURE_OPENAI_ENDPOINT:
+        os.environ["AZURE_OPENAI_ENDPOINT"] = user_config.AZURE_OPENAI_ENDPOINT
+    if user_config.AZURE_OPENAI_API_KEY:
+        os.environ["AZURE_OPENAI_API_KEY"] = user_config.AZURE_OPENAI_API_KEY
+    if user_config.AZURE_OPENAI_DEPLOYMENT:
+        os.environ["AZURE_OPENAI_DEPLOYMENT"] = user_config.AZURE_OPENAI_DEPLOYMENT
+    if user_config.AZURE_OPENAI_API_VERSION:
+        os.environ["AZURE_OPENAI_API_VERSION"] = user_config.AZURE_OPENAI_API_VERSION
 
 
 def get_resource(relative_path):

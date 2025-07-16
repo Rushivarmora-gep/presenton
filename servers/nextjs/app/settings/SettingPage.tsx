@@ -32,6 +32,11 @@ const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
         description: "Required for using OpenAI services",
         placeholder: "Enter your OpenAI API key",
     },
+    azure: {
+        title: "Azure OpenAI Configuration",
+        description: "Endpoint, API Key and Deployment name",
+        placeholder: "Enter your Azure API key",
+    },
     google: {
         title: "Google API Key",
         description: "Required for using Google services",
@@ -99,6 +104,14 @@ const SettingsPage = () => {
             setLlmConfig({ ...llmConfig, CUSTOM_MODEL: new_value });
         } else if (field === 'pexels_api_key') {
             setLlmConfig({ ...llmConfig, PEXELS_API_KEY: new_value });
+        } else if (field === 'azure_endpoint') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_ENDPOINT: new_value });
+        } else if (field === 'azure_api_key') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_API_KEY: new_value });
+        } else if (field === 'azure_deployment') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_DEPLOYMENT: new_value });
+        } else if (field === 'azure_api_version') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_API_VERSION: new_value });
         }
     }
 
@@ -337,7 +350,7 @@ const SettingsPage = () => {
                         </div>
 
                         {/* API Key Input */}
-                        {llmConfig.LLM !== 'ollama' && llmConfig.LLM !== 'custom' && (
+                        {llmConfig.LLM !== 'ollama' && llmConfig.LLM !== 'custom' && llmConfig.LLM !== 'azure' && (
                             <div className="space-y-6">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -353,6 +366,47 @@ const SettingsPage = () => {
                                         />
                                     </div>
                                     <p className="mt-2 text-sm text-gray-500">{PROVIDER_CONFIGS[llmConfig.LLM!].description}</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {llmConfig.LLM === 'azure' && (
+                            <div className="space-y-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Azure Endpoint</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 border border-gray-300 outline-none rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                        value={llmConfig.AZURE_OPENAI_ENDPOINT || ''}
+                                        onChange={(e) => input_field_changed(e.target.value, 'azure_endpoint')}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Azure API Key</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 border border-gray-300 outline-none rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                        value={llmConfig.AZURE_OPENAI_API_KEY || ''}
+                                        onChange={(e) => input_field_changed(e.target.value, 'azure_api_key')}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Deployment Name</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 border border-gray-300 outline-none rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                        value={llmConfig.AZURE_OPENAI_DEPLOYMENT || ''}
+                                        onChange={(e) => input_field_changed(e.target.value, 'azure_deployment')}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">API Version</label>
+                                    <input
+                                        type="text"
+                                        className="w-full px-4 py-2.5 border border-gray-300 outline-none rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                        value={llmConfig.AZURE_OPENAI_API_VERSION || ''}
+                                        onChange={(e) => input_field_changed(e.target.value, 'azure_api_version')}
+                                    />
                                 </div>
                             </div>
                         )}

@@ -29,7 +29,7 @@ const setupUserConfigFromEnv = () => {
     existingConfig = JSON.parse(fs.readFileSync(userConfigPath, 'utf8'));
   }
 
-  if (!['ollama', 'openai', 'google'].includes(existingConfig.LLM)) {
+  if (!['ollama', 'openai', 'google', 'custom', 'azure'].includes(existingConfig.LLM)) {
     existingConfig.LLM = undefined;
   }
 
@@ -44,6 +44,10 @@ const setupUserConfigFromEnv = () => {
     CUSTOM_MODEL: process.env.CUSTOM_MODEL || existingConfig.CUSTOM_MODEL,
     PEXELS_API_KEY: process.env.PEXELS_API_KEY || existingConfig.PEXELS_API_KEY,
     USE_CUSTOM_URL: process.env.USE_CUSTOM_URL || existingConfig.USE_CUSTOM_URL,
+    AZURE_OPENAI_ENDPOINT: process.env.AZURE_OPENAI_ENDPOINT || existingConfig.AZURE_OPENAI_ENDPOINT,
+    AZURE_OPENAI_API_KEY: process.env.AZURE_OPENAI_API_KEY || existingConfig.AZURE_OPENAI_API_KEY,
+    AZURE_OPENAI_DEPLOYMENT: process.env.AZURE_OPENAI_DEPLOYMENT || existingConfig.AZURE_OPENAI_DEPLOYMENT,
+    AZURE_OPENAI_API_VERSION: process.env.AZURE_OPENAI_API_VERSION || existingConfig.AZURE_OPENAI_API_VERSION,
   };
 
   fs.writeFileSync(userConfigPath, JSON.stringify(userConfig));
