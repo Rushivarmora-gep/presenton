@@ -28,6 +28,13 @@ async def check_llm_model_availability():
             if not openai_api_key:
                 raise Exception("OPENAI_API_KEY must be provided")
 
+        elif get_selected_llm_provider() == SelectedLLMProvider.AZURE:
+            endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+            api_key = os.getenv("AZURE_OPENAI_API_KEY")
+            deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+            if not endpoint or not api_key or not deployment:
+                raise Exception("AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY and AZURE_OPENAI_DEPLOYMENT must be provided")
+
         elif get_selected_llm_provider() == SelectedLLMProvider.GOOGLE:
             google_api_key = os.getenv("GOOGLE_API_KEY")
             if not google_api_key:

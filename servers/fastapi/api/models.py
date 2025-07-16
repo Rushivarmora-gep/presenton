@@ -69,6 +69,10 @@ class UserConfig(BaseModel):
     CUSTOM_LLM_API_KEY: Optional[str] = None
     CUSTOM_MODEL: Optional[str] = None
     PEXELS_API_KEY: Optional[str] = None
+    AZURE_OPENAI_ENDPOINT: Optional[str] = None
+    AZURE_OPENAI_API_KEY: Optional[str] = None
+    AZURE_OPENAI_DEPLOYMENT: Optional[str] = None
+    AZURE_OPENAI_API_VERSION: Optional[str] = None
 
 
 class OllamaModelMetadata(BaseModel):
@@ -83,5 +87,6 @@ class OllamaModelMetadata(BaseModel):
 class SelectedLLMProvider(Enum):
     OLLAMA = "ollama"
     OPENAI = "openai"
+    AZURE = "azure"
     GOOGLE = "google"
     CUSTOM = "custom"

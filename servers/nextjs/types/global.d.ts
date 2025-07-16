@@ -23,6 +23,10 @@ interface LLMConfig {
   CUSTOM_LLM_API_KEY?: string;
   CUSTOM_MODEL?: string;
   PEXELS_API_KEY?: string;
+  AZURE_OPENAI_ENDPOINT?: string;
+  AZURE_OPENAI_API_KEY?: string;
+  AZURE_OPENAI_DEPLOYMENT?: string;
+  AZURE_OPENAI_API_VERSION?: string;
 
   // Only used in UI settings
   USE_CUSTOM_URL?: boolean;

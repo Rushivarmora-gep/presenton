@@ -84,6 +84,33 @@ const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
             docsUrl: "https://platform.openai.com/docs/api-reference/authentication",
         },
     },
+    azure: {
+        textModels: [
+            {
+                value: "azure-openai",
+                label: "Azure OpenAI",
+                description: "Azure hosted OpenAI model",
+                icon: "/icons/openai.png",
+                size: "8GB",
+            },
+        ],
+        imageModels: [
+            {
+                value: "dall-e-3",
+                label: "DALL-E 3",
+                description: "Latest version with highest quality",
+                icon: "/icons/dall-e.png",
+                size: "8GB",
+            },
+        ],
+        apiGuide: {
+            title: "Configure Azure OpenAI",
+            steps: [
+                "Provide endpoint, API key and deployment name",
+            ],
+            docsUrl: "https://learn.microsoft.com/azure/ai-services/openai/",
+        },
+    },
     google: {
         textModels: [
             {
@@ -206,6 +233,14 @@ export default function Home() {
             setLlmConfig({ ...llmConfig, CUSTOM_MODEL: new_value });
         } else if (field === 'pexels_api_key') {
             setLlmConfig({ ...llmConfig, PEXELS_API_KEY: new_value });
+        } else if (field === 'azure_endpoint') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_ENDPOINT: new_value });
+        } else if (field === 'azure_api_key') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_API_KEY: new_value });
+        } else if (field === 'azure_deployment') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_DEPLOYMENT: new_value });
+        } else if (field === 'azure_api_version') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_API_VERSION: new_value });
         }
     }
 
@@ -425,7 +460,7 @@ export default function Home() {
                     </div>
 
                     {/* API Key Input */}
-                    {llmConfig.LLM !== 'ollama' && llmConfig.LLM !== 'custom' && <div className="mb-8">
+                    {llmConfig.LLM !== 'ollama' && llmConfig.LLM !== 'custom' && llmConfig.LLM !== 'azure' && <div className="mb-8">
                         <label className="block text-sm font-medium text-gray-700 mb-2">
                             {llmConfig.LLM!.charAt(0).toUpperCase() +
                                 llmConfig.LLM!.slice(1)}{" "}
@@ -445,6 +480,46 @@ export default function Home() {
                             Your API key will be stored locally and never shared
                         </p>
                     </div>}
+                    {llmConfig.LLM === 'azure' && (
+                        <div className="mb-8 space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Azure Endpoint</label>
+                                <input
+                                    type="text"
+                                    value={llmConfig.AZURE_OPENAI_ENDPOINT || ''}
+                                    onChange={(e) => input_field_changed(e.target.value, 'azure_endpoint')}
+                                    className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Azure API Key</label>
+                                <input
+                                    type="text"
+                                    value={llmConfig.AZURE_OPENAI_API_KEY || ''}
+                                    onChange={(e) => input_field_changed(e.target.value, 'azure_api_key')}
+                                    className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">Deployment Name</label>
+                                <input
+                                    type="text"
+                                    value={llmConfig.AZURE_OPENAI_DEPLOYMENT || ''}
+                                    onChange={(e) => input_field_changed(e.target.value, 'azure_deployment')}
+                                    className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">API Version</label>
+                                <input
+                                    type="text"
+                                    value={llmConfig.AZURE_OPENAI_API_VERSION || ''}
+                                    onChange={(e) => input_field_changed(e.target.value, 'azure_api_version')}
+                                    className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                />
+                            </div>
+                        </div>
+                    )}
                     {
                         llmConfig.LLM === 'ollama' && (<div>
                             <div className="mb-8">

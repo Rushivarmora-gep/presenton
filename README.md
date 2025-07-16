@@ -62,7 +62,7 @@ Open http://localhost:5000 on browser of your choice to use Presenton.
 You may want to directly provide your API KEYS as environment variables and keep them hidden. You can set these environment variables to achieve it.
 
 - **CAN_CHANGE_KEYS=[true/false]**: Set this to **false** if you want to keep API Keys hidden and make them unmodifiable.
-- **LLM=[openai/google/ollama/custom]**: Select **LLM** of your choice.
+- **LLM=[openai/azure/google/ollama/custom]**: Select **LLM** of your choice.
 - **OPENAI_API_KEY=[Your OpenAI API Key]**: Provide this if **LLM** is set to **openai**
 - **GOOGLE_API_KEY=[Your Google API Key]**: Provide this if **LLM** is set to **google**
 - **OLLAMA_URL=[Custom Ollama URL]**: Provide this if you want to custom Ollama URL and **LLM** is set to **ollama**
@@ -71,10 +71,25 @@ You may want to directly provide your API KEYS as environment variables and keep
 - **CUSTOM_LLM_API_KEY=[Custom OpenAI Compatible API KEY]**: Provide this if **LLM** is set to **custom**
 - **CUSTOM_MODEL=[Custom Model ID]**: Provide this if **LLM** is set to **custom**
 - **PEXELS_API_KEY=[Your Pexels API Key]**: Provide this to generate images if **LLM** is set to **ollama** or **custom**
+- **AZURE_OPENAI_ENDPOINT=[Your Azure Endpoint]**: Provide this if **LLM** is set to **azure**
+- **AZURE_OPENAI_API_KEY=[Your Azure API Key]**: Provide this if **LLM** is set to **azure**
+- **AZURE_OPENAI_DEPLOYMENT=[Azure Deployment Name]**: Provide this if **LLM** is set to **azure**
+- **AZURE_OPENAI_API_VERSION=[Azure API Version]**: Optional API version for Azure
 
 ### Using OpenAI
 ```bash
 docker run -it --name presenton -p 5000:80 -e LLM="openai" -e OPENAI_API_KEY="******" -e CAN_CHANGE_KEYS="false" -v "./user_data:/app/user_data" ghcr.io/presenton/presenton:latest
+```
+
+### Using Azure OpenAI
+```bash
+docker run -it --name presenton -p 5000:80 \
+  -e LLM="azure" \
+  -e AZURE_OPENAI_ENDPOINT="https://YOUR_RESOURCE.openai.azure.com" \
+  -e AZURE_OPENAI_API_KEY="*****" \
+  -e AZURE_OPENAI_DEPLOYMENT="gpt-4" \
+  -e CAN_CHANGE_KEYS="false" \
+  -v "./user_data:/app/user_data" ghcr.io/presenton/presenton:latest
 ```
 
 ### Using Ollama
