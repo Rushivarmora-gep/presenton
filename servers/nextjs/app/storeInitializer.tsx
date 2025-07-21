@@ -38,28 +38,12 @@ export function StoreInitializer({ children }: { children: React.ReactNode }) {
       const response = await fetch('/api/user-config');
       const llmConfig = await response.json();
       if (!llmConfig.LLM) {
-        llmConfig.LLM = 'openai';
+        llmConfig.LLM = 'azure_openai';
       }
       dispatch(setLLMConfig(llmConfig));
       const isValid = hasValidLLMConfig(llmConfig);
       if (isValid) {
-        // Check if the selected Ollama model is pulled
-        if (llmConfig.LLM === 'ollama') {
-          const isPulled = await checkIfSelectedOllamaModelIsPulled(llmConfig.OLLAMA_MODEL);
-          if (!isPulled) {
-            router.push('/');
-            setLoadingToFalseAfterNavigatingTo('/');
-            return;
-          }
-        }
-        if (llmConfig.LLM === 'custom') {
-          const isAvailable = await checkIfSelectedCustomModelIsAvailable(llmConfig.CUSTOM_MODEL);
-          if (!isAvailable) {
-            router.push('/');
-            setLoadingToFalseAfterNavigatingTo('/');
-            return;
-          }
-        }
+        // Only azure_openai supported, no additional checks
         if (route === '/') {
           router.push('/upload');
           setLoadingToFalseAfterNavigatingTo('/upload');
