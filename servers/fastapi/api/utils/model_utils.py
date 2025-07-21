@@ -52,6 +52,8 @@ def get_model_base_url():
 
     if selected_llm == SelectedLLMProvider.OPENAI:
         return "https://api.openai.com/v1"
+    elif selected_llm == SelectedLLMProvider.AZURE_OPENAI:
+        return os.getenv("AZURE_OPENAI_ENDPOINT")
     elif selected_llm == SelectedLLMProvider.GOOGLE:
         return "https://generativelanguage.googleapis.com/v1beta/openai"
     elif selected_llm == SelectedLLMProvider.OLLAMA:
@@ -66,6 +68,8 @@ def get_llm_api_key():
     selected_llm = get_selected_llm_provider()
     if selected_llm == SelectedLLMProvider.OPENAI:
         return os.getenv("OPENAI_API_KEY")
+    elif selected_llm == SelectedLLMProvider.AZURE_OPENAI:
+        return os.getenv("AZURE_OPENAI_API_KEY")
     elif selected_llm == SelectedLLMProvider.GOOGLE:
         return os.getenv("GOOGLE_API_KEY")
     elif selected_llm == SelectedLLMProvider.OLLAMA:
@@ -77,10 +81,18 @@ def get_llm_api_key():
 
 
 def get_llm_client():
-    client = AsyncOpenAI(
-        base_url=get_model_base_url(),
-        api_key=get_llm_api_key(),
-    )
+    selected_llm = get_selected_llm_provider()
+    if selected_llm == SelectedLLMProvider.AZURE_OPENAI:
+        client = openai.AsyncAzureOpenAI(
+            api_key=os.getenv("AZURE_OPENAI_API_KEY"),
+            azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+            api_version=os.getenv("AZURE_OPENAI_API_VERSION"),
+        )
+    else:
+        client = AsyncOpenAI(
+            base_url=get_model_base_url(),
+            api_key=get_llm_api_key(),
+        )
     return client
 
 
@@ -88,6 +100,8 @@ def get_large_model():
     selected_llm = get_selected_llm_provider()
     if selected_llm == SelectedLLMProvider.OPENAI:
         return "gpt-4.1"
+    elif selected_llm == SelectedLLMProvider.AZURE_OPENAI:
+        return os.getenv("AZURE_OPENAI_DEPLOYMENT")
     elif selected_llm == SelectedLLMProvider.GOOGLE:
         return "gemini-2.0-flash"
     elif selected_llm == SelectedLLMProvider.OLLAMA:
@@ -102,6 +116,8 @@ def get_small_model():
     selected_llm = get_selected_llm_provider()
     if selected_llm == SelectedLLMProvider.OPENAI:
         return "gpt-4.1-mini"
+    elif selected_llm == SelectedLLMProvider.AZURE_OPENAI:
+        return os.getenv("AZURE_OPENAI_DEPLOYMENT")
     elif selected_llm == SelectedLLMProvider.GOOGLE:
         return "gemini-2.0-flash"
     elif selected_llm == SelectedLLMProvider.OLLAMA:
@@ -116,6 +132,8 @@ def get_nano_model():
     selected_llm = get_selected_llm_provider()
     if selected_llm == SelectedLLMProvider.OPENAI:
         return "gpt-4.1-nano"
+    elif selected_llm == SelectedLLMProvider.AZURE_OPENAI:
+        return os.getenv("AZURE_OPENAI_DEPLOYMENT")
     elif selected_llm == SelectedLLMProvider.GOOGLE:
         return "gemini-2.0-flash"
     elif selected_llm == SelectedLLMProvider.OLLAMA:

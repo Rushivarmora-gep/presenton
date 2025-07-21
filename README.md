@@ -70,7 +70,7 @@ Open http://localhost:5000 on browser of your choice to use Presenton.
 You may want to directly provide your API KEYS as environment variables and keep them hidden. You can set these environment variables to achieve it.
 
 - **CAN_CHANGE_KEYS=[true/false]**: Set this to **false** if you want to keep API Keys hidden and make them unmodifiable.
-- **LLM=[openai/google/ollama/custom]**: Select **LLM** of your choice.
+- **LLM=[azure_openai]**: Select **LLM** of your choice. Only `azure_openai` is supported in this build.
 - **OPENAI_API_KEY=[Your OpenAI API Key]**: Provide this if **LLM** is set to **openai**
 - **GOOGLE_API_KEY=[Your Google API Key]**: Provide this if **LLM** is set to **google**
 - **OLLAMA_URL=[Custom Ollama URL]**: Provide this if you want to custom Ollama URL and **LLM** is set to **ollama**
@@ -79,20 +79,21 @@ You may want to directly provide your API KEYS as environment variables and keep
 - **CUSTOM_LLM_API_KEY=[Custom OpenAI Compatible API KEY]**: Provide this if **LLM** is set to **custom**
 - **CUSTOM_MODEL=[Custom Model ID]**: Provide this if **LLM** is set to **custom**
 - **PEXELS_API_KEY=[Your Pexels API Key]**: Provide this to generate images if **LLM** is set to **ollama** or **custom**
+- **AZURE_OPENAI_ENDPOINT=[Your Azure OpenAI Endpoint]**: Provide this if **LLM** is set to **azure_openai**
+- **AZURE_OPENAI_API_KEY=[Your Azure OpenAI API Key]**: Provide this if **LLM** is set to **azure_openai**
+- **AZURE_OPENAI_DEPLOYMENT=[Azure OpenAI Deployment Name]**: Provide this if **LLM** is set to **azure_openai**
+- **AZURE_OPENAI_API_VERSION=[Azure OpenAI API Version]**: Provide this if **LLM** is set to **azure_openai**
 
-### Using OpenAI
+### Using Azure OpenAI
 ```bash
-docker run -it --name presenton -p 5000:80 -e LLM="openai" -e OPENAI_API_KEY="******" -e CAN_CHANGE_KEYS="false" -v "./user_data:/app/user_data" ghcr.io/presenton/presenton:latest
-```
-
-### Using Ollama
-```bash
-docker run -it --name presenton -p 5000:80 -e LLM="ollama" -e OLLAMA_MODEL="llama3.2:3b" -e PEXELS_API_KEY="*******" -e CAN_CHANGE_KEYS="false" -v "./user_data:/app/user_data" ghcr.io/presenton/presenton:latest
-```
-
-### Using OpenAI Compatible API
-```bash
-docker run -it -p 5000:80 -e CAN_CHANGE_KEYS="false"  -e LLM="custom" -e CUSTOM_LLM_URL="http://*****" -e CUSTOM_LLM_API_KEY="*****" -e CUSTOM_MODEL="llama3.2:3b" -v "./user_data:/app/user_data" ghcr.io/presenton/presenton:latest
+docker run -it --name presenton -p 5000:80 \
+  -e LLM="azure_openai" \
+  -e AZURE_OPENAI_ENDPOINT="https://your-endpoint.openai.azure.com" \
+  -e AZURE_OPENAI_API_KEY="*****" \
+  -e AZURE_OPENAI_DEPLOYMENT="your-deployment" \
+  -e AZURE_OPENAI_API_VERSION="2024-02-15-preview" \
+  -e CAN_CHANGE_KEYS="false" \
+  -v "./user_data:/app/user_data" ghcr.io/presenton/presenton:latest
 ```
 
 #### Running Presenton with GPU Support

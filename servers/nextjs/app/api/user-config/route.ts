@@ -42,6 +42,10 @@ export async function POST(request: Request) {
     CUSTOM_LLM_API_KEY: userConfig.CUSTOM_LLM_API_KEY || existingConfig.CUSTOM_LLM_API_KEY,
     CUSTOM_MODEL: userConfig.CUSTOM_MODEL || existingConfig.CUSTOM_MODEL,
     PEXELS_API_KEY: userConfig.PEXELS_API_KEY || existingConfig.PEXELS_API_KEY,
+    AZURE_OPENAI_ENDPOINT: userConfig.AZURE_OPENAI_ENDPOINT || existingConfig.AZURE_OPENAI_ENDPOINT,
+    AZURE_OPENAI_API_KEY: userConfig.AZURE_OPENAI_API_KEY || existingConfig.AZURE_OPENAI_API_KEY,
+    AZURE_OPENAI_DEPLOYMENT: userConfig.AZURE_OPENAI_DEPLOYMENT || existingConfig.AZURE_OPENAI_DEPLOYMENT,
+    AZURE_OPENAI_API_VERSION: userConfig.AZURE_OPENAI_API_VERSION || existingConfig.AZURE_OPENAI_API_VERSION,
     USE_CUSTOM_URL: userConfig.USE_CUSTOM_URL === undefined ? existingConfig.USE_CUSTOM_URL : userConfig.USE_CUSTOM_URL,
   }
   fs.writeFileSync(userConfigPath, JSON.stringify(mergedConfig))
