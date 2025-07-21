@@ -52,12 +52,12 @@ interface ProviderConfig {
 }
 
 const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
-    openai: {
+    azure_openai: {
         textModels: [
             {
                 value: "gpt-4",
                 label: "GPT-4",
-                description: "Most capable model, best for complex tasks",
+                description: "Azure OpenAI deployment",
                 icon: "/icons/openai.png",
                 size: "8GB",
             },
@@ -66,98 +66,20 @@ const PROVIDER_CONFIGS: Record<string, ProviderConfig> = {
             {
                 value: "dall-e-3",
                 label: "DALL-E 3",
-                description: "Latest version with highest quality",
+                description: "Image generation model",
                 icon: "/icons/dall-e.png",
                 size: "8GB",
             },
         ],
         apiGuide: {
-            title: "How to get your OpenAI API Key",
+            title: "Azure OpenAI Configuration",
             steps: [
-                "Go to platform.openai.com and sign in or create an account",
-                'Click on your profile icon and select "View API keys"',
-                'Click "Create new secret key" and give it a name',
-                "Copy your API key immediately (you won't be able to see it again)",
-                "Make sure you have sufficient credits in your account",
+                "Create an Azure OpenAI resource",
+                "Create a deployment and note the name",
+                "Copy the endpoint and API key",
             ],
-            videoUrl: "https://www.youtube.com/watch?v=OB99E7Y1cMA",
-            docsUrl: "https://platform.openai.com/docs/api-reference/authentication",
-        },
-    },
-    google: {
-        textModels: [
-            {
-                value: "gemini-pro",
-                label: "Gemini Pro",
-                description: "Balanced model for most tasks",
-                icon: "/icons/google.png",
-                size: "8GB",
-            },
-        ],
-        imageModels: [
-            {
-                value: "imagen",
-                label: "Imagen",
-                description: "Google's primary image generation model",
-                icon: "/icons/google.png",
-                size: "8GB",
-            },
-        ],
-        apiGuide: {
-            title: "How to get your Google AI Studio API Key",
-            steps: [
-                "Visit aistudio.google.com",
-                'Click on "Get API key" in the top navigation',
-                'Click "Create API key" on the next page',
-                'Choose either "Create API Key in new Project" or select an existing project',
-                "Copy your API key - you're ready to go!",
-            ],
-            videoUrl: "https://www.youtube.com/watch?v=o8iyrtQyrZM&t=66s",
-            docsUrl: "https://aistudio.google.com/app/apikey",
-        },
-    },
-    ollama: {
-        textModels: [],
-        imageModels: [
-            {
-                value: "pexels",
-                label: "Pexels",
-                description: "Pexels is a free stock photo and video platform that allows you to download high-quality images and videos for free.",
-                icon: "/icons/pexels.png",
-                size: "8GB",
-            },
-        ],
-        apiGuide: {
-            title: "How to get your Pexels API Key",
-            steps: [
-                "Visit pexels.com",
-                'Click on "Get API key" in the top navigation',
-                "Copy your API key - you're ready to go!",
-            ],
-            videoUrl: "https://www.youtube.com/watch?v=o8iyrtQyrZM&t=66s",
-            docsUrl: "https://www.pexels.com/api/documentation/",
-        },
-    },
-    custom: {
-        textModels: [],
-        imageModels: [
-            {
-                value: "pexels",
-                label: "Pexels",
-                description: "Pexels is a free stock photo and video platform that allows you to download high-quality images and videos for free.",
-                icon: "/icons/pexels.png",
-                size: "8GB",
-            },
-        ],
-        apiGuide: {
-            title: "How to get your Pexels API Key",
-            steps: [
-                "Visit pexels.com",
-                'Click on "Get API key" in the top navigation',
-                "Copy your API key - you're ready to go!",
-            ],
-            videoUrl: "https://www.youtube.com/watch?v=o8iyrtQyrZM&t=66s",
-            docsUrl: "https://www.pexels.com/api/documentation/",
+            videoUrl: undefined,
+            docsUrl: "https://learn.microsoft.com/azure/ai-services/openai/",
         },
     },
 };
@@ -190,10 +112,14 @@ export default function Home() {
     const canChangeKeys = config.can_change_keys;
 
     const input_field_changed = (new_value: string, field: string) => {
-        if (field === 'openai_api_key') {
-            setLlmConfig({ ...llmConfig, OPENAI_API_KEY: new_value });
-        } else if (field === 'google_api_key') {
-            setLlmConfig({ ...llmConfig, GOOGLE_API_KEY: new_value });
+        if (field === 'azure_openai_endpoint') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_ENDPOINT: new_value });
+        } else if (field === 'azure_openai_api_key') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_API_KEY: new_value });
+        } else if (field === 'azure_openai_deployment') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_DEPLOYMENT: new_value });
+        } else if (field === 'azure_openai_api_version') {
+            setLlmConfig({ ...llmConfig, AZURE_OPENAI_API_VERSION: new_value });
         } else if (field === 'ollama_url') {
             setLlmConfig({ ...llmConfig, OLLAMA_URL: new_value });
         } else if (field === 'ollama_model') {
@@ -212,10 +138,6 @@ export default function Home() {
     const handleSaveConfig = async () => {
         try {
             await handleSaveLLMConfig(llmConfig);
-            if (llmConfig.LLM === 'ollama') {
-                setIsLoading(true);
-                await pullOllamaModels();
-            }
             toast({
                 title: 'Success',
                 description: 'Configuration saved successfully',
@@ -233,31 +155,9 @@ export default function Home() {
         }
     };
 
-    const fetchOllamaModelsWithConfig = async (config: any) => {
-        try {
-            const response = await fetch('/api/v1/ppt/ollama/list-supported-models');
-            const data = await response.json();
-            setOllamaModels(data.models);
-
-            // Check if currently selected model is still available
-            if (config.OLLAMA_MODEL && data.models.length > 0) {
-                const isModelAvailable = data.models.some((model: any) => model.value === config.OLLAMA_MODEL);
-                if (!isModelAvailable) {
-                    setLlmConfig({ ...config, OLLAMA_MODEL: '' });
-                }
-            }
-        } catch (error) {
-            console.error('Error fetching ollama models:', error);
-        }
-    }
-
     const changeProvider = (provider: string) => {
         const newConfig = { ...llmConfig, LLM: provider };
         setLlmConfig(newConfig);
-        if (provider === 'ollama') {
-            // Use the new config to avoid stale state issues
-            fetchOllamaModelsWithConfig(newConfig);
-        }
     }
 
     const resetDownloadingModel = () => {
@@ -268,45 +168,6 @@ export default function Home() {
             status: '',
             done: false,
         });
-    }
-
-    const pullOllamaModels = async (): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            const interval = setInterval(async () => {
-                try {
-                    const response = await fetch(`/api/v1/ppt/ollama/pull-model?name=${llmConfig.OLLAMA_MODEL}`);
-                    if (response.status === 200) {
-                        const data = await response.json();
-                        if (data.done && data.status !== 'error') {
-                            clearInterval(interval);
-                            setDownloadingModel(data);
-                            resolve();
-                        } else if (data.status === 'error') {
-                            clearInterval(interval);
-                            resetDownloadingModel();
-                            reject(new Error('Error occurred while pulling model'));
-                        } else {
-                            setDownloadingModel(data);
-                        }
-                    } else {
-                        clearInterval(interval);
-                        resetDownloadingModel();
-                        if (response.status === 403) {
-                            reject(new Error('Request to Ollama Not Authorized'));
-                        }
-                        reject(new Error('Error occurred while pulling model'));
-                    }
-                } catch (error) {
-                    clearInterval(interval);
-                    resetDownloadingModel();
-                    reject(error);
-                }
-            }, 1000);
-        });
-    }
-
-    const fetchOllamaModels = async () => {
-        await fetchOllamaModelsWithConfig(llmConfig);
     }
 
     const fetchCustomModels = async () => {
@@ -424,26 +285,48 @@ export default function Home() {
                         </div>
                     </div>
 
-                    {/* API Key Input */}
-                    {llmConfig.LLM !== 'ollama' && llmConfig.LLM !== 'custom' && <div className="mb-8">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                            {llmConfig.LLM!.charAt(0).toUpperCase() +
-                                llmConfig.LLM!.slice(1)}{" "}
-                            API Key
-                        </label>
-                        <div className="relative">
+                    {/* Azure OpenAI Configuration */}
+                    {llmConfig.LLM === 'azure_openai' && <div className="space-y-4 mb-8">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Endpoint</label>
                             <input
                                 type="text"
-                                value={llmConfig.LLM === 'openai' ? llmConfig.OPENAI_API_KEY || '' : llmConfig.GOOGLE_API_KEY || ''}
-                                onChange={(e) => input_field_changed(e.target.value, llmConfig.LLM === 'openai' ? 'openai_api_key' : 'google_api_key')}
+                                value={llmConfig.AZURE_OPENAI_ENDPOINT || ''}
+                                onChange={(e) => input_field_changed(e.target.value, 'azure_openai_endpoint')}
+                                className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                placeholder="https://your-endpoint.openai.azure.com"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">API Key</label>
+                            <input
+                                type="text"
+                                value={llmConfig.AZURE_OPENAI_API_KEY || ''}
+                                onChange={(e) => input_field_changed(e.target.value, 'azure_openai_api_key')}
                                 className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
                                 placeholder="Enter your API key"
                             />
                         </div>
-                        <p className="mt-2 text-sm text-gray-500 flex items-center gap-2">
-                            <span className="block w-1 h-1 rounded-full bg-gray-400"></span>
-                            Your API key will be stored locally and never shared
-                        </p>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Deployment Name</label>
+                            <input
+                                type="text"
+                                value={llmConfig.AZURE_OPENAI_DEPLOYMENT || ''}
+                                onChange={(e) => input_field_changed(e.target.value, 'azure_openai_deployment')}
+                                className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                placeholder="Your deployment"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">API Version</label>
+                            <input
+                                type="text"
+                                value={llmConfig.AZURE_OPENAI_API_VERSION || ''}
+                                onChange={(e) => input_field_changed(e.target.value, 'azure_openai_api_version')}
+                                className="w-full px-4 py-2.5 outline-none border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-colors"
+                                placeholder="2024-02-15-preview"
+                            />
+                        </div>
                     </div>}
                     {
                         llmConfig.LLM === 'ollama' && (<div>
@@ -830,8 +713,8 @@ export default function Home() {
                     {/* Save Button */}
                     <button
                         onClick={handleSaveConfig}
-                        disabled={isLoading || (llmConfig.LLM === 'ollama' && !llmConfig.OLLAMA_MODEL) || (llmConfig.LLM === 'custom' && !llmConfig.CUSTOM_MODEL)}
-                        className={`mt-8 w-full font-semibold py-3 px-4 rounded-lg transition-all duration-500 ${isLoading || (llmConfig.LLM === 'ollama' && !llmConfig.OLLAMA_MODEL) || (llmConfig.LLM === 'custom' && !llmConfig.CUSTOM_MODEL)
+                        disabled={isLoading}
+                        className={`mt-8 w-full font-semibold py-3 px-4 rounded-lg transition-all duration-500 ${isLoading
                             ? 'bg-gray-400 cursor-not-allowed'
                             : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:ring-4 focus:ring-blue-200'
                             } text-white`}
@@ -839,25 +722,13 @@ export default function Home() {
                         {isLoading ? (
                             <div className="flex items-center justify-center gap-2">
                                 <Loader2 className="w-4 h-4 animate-spin" />
-                                {llmConfig.LLM === 'ollama' && downloadingModel.downloaded || 0 > 0
-                                    ? `Downloading Model (${(((downloadingModel.downloaded || 0) / (downloadingModel.size || 1)) * 100).toFixed(0)}%)`
-                                    : 'Saving Configuration...'
-                                }
+                                {'Saving Configuration...'}
                             </div>
                         ) : (
-                            (llmConfig.LLM === 'ollama' && !llmConfig.OLLAMA_MODEL) || (llmConfig.LLM === 'custom' && !llmConfig.CUSTOM_MODEL)
-                                ? 'Please Select a Model'
-                                : 'Save Configuration'
+                            'Save Configuration'
                         )}
                     </button>
 
-                    {
-                        llmConfig.LLM === 'ollama' && downloadingModel.status && downloadingModel.status !== 'pulled' && (
-                            <div className="mt-3 text-sm bg-green-100 rounded-lg p-2 font-semibold capitalize text-center text-gray-600">
-                                {downloadingModel.status}
-                            </div>
-                        )
-                    }
                 </div>
             </main>
         </div>
